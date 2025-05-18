@@ -1,0 +1,5 @@
+boto3
+azure-identity
+azure-monitor-query
+prometheus_client
+
