@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtualenv
+.venv/
+venv/
+
+# VSCode or JetBrains
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
