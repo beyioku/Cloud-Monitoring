@@ -5,7 +5,9 @@ from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 # 🔧 CONFIG
 REGION = 'us-east-1'  # My current AWS region
 INSTANCE_ID = 'i-056250a7e38a6d0a7'  # update with your EC2 instance ID
+VOLUME_ID = 'vol-0e331fe5df83e4803'    # my EBS volume ID
 PUSHGATEWAY_URL = 'http://localhost:9091/'  # update with Pushgateway address
+
 
 def main():
     # Create CloudWatch client
@@ -70,6 +72,64 @@ def main():
             print(f"{metric_name}: {value:.2f} Bytes")
         else:
             print(f"⚠️ No datapoints returned for {metric_name} ")
+
+    # ................Volume Read bytes................
+    print("\n Currently Collecting VolumeReadBytes....")
+    response = cloudwatch.get_metric_statistics(
+        Namespace='AWS/EBS',
+        MetricName='VolumeReadBytes',
+        Dimensions=[{'Name': 'VolumeId', 'Value': VOLUME_ID}],
+        StartTime=start_time,
+        EndTime=end_time,
+        Period=300,
+        Statistics=['Average'],
+        Unit='Bytes'
+    )
+    datapoints = response.get('Datapoints', [])
+    if datapoints:
+        latest = sorted(datapoints, key=lambda x: x['Timestamp'])[-1]
+        value = latest['Average']
+        print(f"📥 VolumeReadBytes: {value:.2f} Bytes")
+
+        read_gauge = Gauge('aws_ebs_volumereadbytes', 'Avg EBS Volume Read (Bytes)', ['volume_id'], registry=registry)
+        read_gauge.labels(volume_id=VOLUME_ID).set(value)
+
+        push_to_gateway(PUSHGATEWAY_URL, job='aws_ebs_metrics', registry=registry)
+        print("✅ Pushed VolumeReadBytes to Prometheus")
+    else:
+        print("⚠️ No datapoints returned for VolumeReadBytes")
+
+
+    # ................Volume Write bytes................
+    print("\n Currently Collecting VolumeWriteBytes....")
+    response = cloudwatch.get_metric_statistics(
+        Namespace='AWS/EBS',
+        MetricName='VolumeWriteBytes',
+        Dimensions=[{'Name': 'VolumeId', 'Value': VOLUME_ID}],
+        StartTime=start_time,
+        EndTime=end_time,
+        Period=300,
+        Statistics=['Average'],
+        Unit='Bytes'
+    )
+    datapoints = response.get('Datapoints', [])
+    if datapoints:
+        latest = sorted(datapoints, key=lambda x: x['Timestamp'])[-1]
+        value = latest['Average']
+        print(f"📥 VolumeWriteBytes: {value:.2f} Bytes")
+
+        read_gauge = Gauge('aws_ebs_volumewritebytes', 'Avg EBS Volume Write (Bytes)', ['volume_id'], registry=registry)
+        read_gauge.labels(volume_id=VOLUME_ID).set(value)
+
+        push_to_gateway(PUSHGATEWAY_URL, job='aws_ebs_metrics', registry=registry)
+        print("✅ Pushed VolumeWriteBytes to Prometheus")
+    else:
+        print("⚠️ No datapoints returned for VolumeWriteBytes")
+
+
+
+
+    """     
     # ................Disk I/O Block................
     print("\n Currently Collecting DiskReadBytes and DiskWriteBytes.. ")
     for metric_name in ['DiskReadBytes', 'DiskWriteBytes']:
@@ -93,6 +153,9 @@ def main():
             print(f"{metric_name}: {value:.2f} Bytes")
         else:
             print(f" No datapoints returned for {metric_name}")
+            
+    """
+
 
 
     push_to_gateway(PUSHGATEWAY_URL, job='aws_ec2_metrics', registry=registry)
