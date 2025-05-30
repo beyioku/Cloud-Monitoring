@@ -2,7 +2,7 @@ import boto3
 import datetime
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
-# 🔧 CONFIG
+# AWS CONFIG
 REGION = 'us-east-1'  # My current AWS region
 INSTANCE_ID = 'i-056250a7e38a6d0a7'  # update with your EC2 instance ID
 VOLUME_ID = 'vol-0e331fe5df83e4803'    # my EBS volume ID
@@ -42,8 +42,8 @@ def main():
         latest = sorted(datapoints, key=lambda x: x['Timestamp'])[-1]
         value = latest['Average']
         cpu_gauge = Gauge('aws_ec2_cpu_utilization', 'Average CPU utilization (%)',
-                          ['instance_id'], registry=registry)
-        cpu_gauge.labels(instance_id=INSTANCE_ID).set(value)
+                          ['instance_id', "cloud_provider"], registry=registry)
+        cpu_gauge.labels(instance_id=INSTANCE_ID, cloud_provider="aws").set(value)
         print(f"CPUUtilization: {value:.2f}%")
     else:
         print(f" ⚠️ No datapoints returned for CPUUtilization")
@@ -67,8 +67,8 @@ def main():
             latest = sorted(datapoints, key=lambda x: x['Timestamp'])[-1]
             value = latest['Average']
             net_gauge = Gauge(f'aws_ec2_{metric_name.lower()}', f'Average {metric_name} (Bytes)',
-                              ['instance_id'], registry=registry)
-            net_gauge.labels(instance_id=INSTANCE_ID).set(value)
+                              ['instance_id', "cloud_provider"], registry=registry)
+            net_gauge.labels(instance_id=INSTANCE_ID, cloud_provider="aws").set(value)
             print(f"{metric_name}: {value:.2f} Bytes")
         else:
             print(f"⚠️ No datapoints returned for {metric_name} ")
@@ -91,10 +91,10 @@ def main():
         value = latest['Average']
         print(f"📥 VolumeReadBytes: {value:.2f} Bytes")
 
-        read_gauge = Gauge('aws_ebs_volumereadbytes', 'Avg EBS Volume Read (Bytes)', ['volume_id'], registry=registry)
-        read_gauge.labels(volume_id=VOLUME_ID).set(value)
+        read_gauge = Gauge('aws_ebs_volumereadbytes', 'Avg EBS Volume Read (Bytes)', ['volume_id', "cloud_provider"], registry=registry)
+        read_gauge.labels(volume_id=VOLUME_ID, cloud_provider="aws").set(value)
 
-        push_to_gateway(PUSHGATEWAY_URL, job='aws_ebs_metrics', registry=registry)
+#        push_to_gateway(PUSHGATEWAY_URL, job='aws_ebs_metrics', registry=registry)
         print("✅ Pushed VolumeReadBytes to Prometheus")
     else:
         print("⚠️ No datapoints returned for VolumeReadBytes")
@@ -118,10 +118,10 @@ def main():
         value = latest['Average']
         print(f"📥 VolumeWriteBytes: {value:.2f} Bytes")
 
-        read_gauge = Gauge('aws_ebs_volumewritebytes', 'Avg EBS Volume Write (Bytes)', ['volume_id'], registry=registry)
-        read_gauge.labels(volume_id=VOLUME_ID).set(value)
+        read_gauge = Gauge('aws_ebs_volumewritebytes', 'Avg EBS Volume Write (Bytes)', ['volume_id', "cloud_provider"], registry=registry)
+        read_gauge.labels(volume_id=VOLUME_ID, cloud_provider="aws").set(value)
 
-        push_to_gateway(PUSHGATEWAY_URL, job='aws_ebs_metrics', registry=registry)
+ #       push_to_gateway(PUSHGATEWAY_URL, job='aws_ebs_metrics', registry=registry)
         print("✅ Pushed VolumeWriteBytes to Prometheus")
     else:
         print("⚠️ No datapoints returned for VolumeWriteBytes")
