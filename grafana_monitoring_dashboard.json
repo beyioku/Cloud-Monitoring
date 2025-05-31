@@ -15,11 +15,10 @@
       }
     ]
   },
-  "description": "v1.0 AWS-Only (Grafana)",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -80,7 +79,38 @@
           },
           "unit": "percent"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AWS - i-056250a7e38a6d0a7"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Azure - azure-monitoring-vm"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -107,12 +137,29 @@
         {
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "aws_ec2_cpu_utilization{instance_id=\"i-056250a7e38a6d0a7\"}",
+          "expr": "aws_ec2_cpu_utilization{cloud_provider=\"aws\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "legendFormat": "{{instance_id}} (AWS) CPU",
+          "legendFormat": "AWS - {{instance_id}}",
           "range": true,
-          "refId": "CPU Utilization (AWS & AZURE)",
+          "refId": "CPU Utilization (AWS )",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fen2207hl80zke"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "azure_vm_cpu_utilization{cloud_provider=\"azure\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Azure - {{vm_name}}",
+          "range": true,
+          "refId": "CPU Utilization (AZURE)",
           "useBackend": false
         }
       ],
@@ -178,7 +225,68 @@
           },
           "unit": "MBs"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vol-0e331fe5df83e4803 (AWS) Read "
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vol-0e331fe5df83e4803 (AWS) Write"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "azure-monitoring-vm (Azure)  Read"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "azure-monitoring-vm (Azure)  Write"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -203,14 +311,20 @@
       "pluginVersion": "12.0.0",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fen2207hl80zke"
+          },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "aws_ebs_volumereadbytes{volume_id=\"vol-0e331fe5df83e4803\"}",
+          "expr": "aws_ebs_volumereadbytes{cloud_provider=\"aws\"}",
           "fullMetaSearch": false,
+          "hide": false,
           "includeNullMetadata": true,
-          "legendFormat": "{{volume_id}} (AWS) Read",
+          "instant": false,
+          "legendFormat": "{{volume_id}} (AWS) Read ",
           "range": true,
-          "refId": "VolumeRead",
+          "refId": "VolumeRead AWS",
           "useBackend": false
         },
         {
@@ -220,14 +334,48 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "aws_ebs_volumewritebytes{volume_id=\"vol-0e331fe5df83e4803\"}",
+          "expr": "aws_ebs_volumewritebytes{cloud_provider=\"aws\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "{{volume_id}} (AWS) Write",
           "range": true,
-          "refId": "VolumeWrite",
+          "refId": "VolumeWrite AWS",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fen2207hl80zke"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "azure_vm_disk_read_bytes{cloud_provider=\"azure\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{vm_name}} (Azure)  Read",
+          "range": true,
+          "refId": "VolumeRead Azure",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fen2207hl80zke"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "azure_vm_disk_write_bytes{cloud_provider=\"azure\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{vm_name}} (Azure)  Write",
+          "range": true,
+          "refId": "VolumeWrite Azure",
           "useBackend": false
         }
       ],
@@ -292,7 +440,68 @@
           },
           "unit": "KBs"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "i-056250a7e38a6d0a7 (AWS) In"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "i-056250a7e38a6d0a7 (AWS) Out"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "azure-monitoring-vm (Azure) In"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "azure-monitoring-vm (Azure) Out"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -343,6 +552,40 @@
           "range": true,
           "refId": "Network Out (AWS)",
           "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fen2207hl80zke"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "azure_vm_network_in",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{vm_name}} (Azure) In",
+          "range": true,
+          "refId": "Network In (Azure)",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fen2207hl80zke"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "azure_vm_network_out",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{vm_name}} (Azure) Out",
+          "range": true,
+          "refId": "Network Out (Azure)",
+          "useBackend": false
         }
       ],
       "title": "Network In /Out (AWS & AZURE)",
@@ -361,7 +604,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Cloud Resource Monitoring Copy (Just AWS)",
-  "uid": "ceee3334-3c03-4632-bf38-4f860962cc97",
-  "version": 3
+  "title": "Cloud Resource Monitoring",
+  "uid": "980f429b-ff19-4445-b8cc-8bb65358cf64",
+  "version": 42
 }
