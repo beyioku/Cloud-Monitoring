@@ -1,6 +1,6 @@
 # Cloud Monitoring Project
 
-This project implements a multi-cloud monitoring system across AWS and Azure using:
+This project implements a Centralized multi-cloud monitoring system across AWS and Azure using:
 - Python for cloud metric collectors
 - Prometheus and Pushgateway for metric ingestion
 - Grafana for visualization
